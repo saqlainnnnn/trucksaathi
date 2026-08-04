@@ -74,3 +74,17 @@ class TranscriptionResult(BaseModel):
     language_probability: float | None = None
 
     request_id: str | None = None
+
+class ValidationIssue(BaseModel):
+    field: str
+    reason: str
+
+
+class ValidationResult(BaseModel):
+    is_complete: bool
+
+    missing_fields: list[str] = Field(default_factory=list)
+
+    low_confidence_fields: list[str] = Field(default_factory=list)
+
+    invalid_fields: list[ValidationIssue] = Field(default_factory=list)

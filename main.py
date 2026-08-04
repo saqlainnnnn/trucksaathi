@@ -3,15 +3,17 @@ from time import perf_counter
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.pretty import Pretty
 
 from extractor import extract_booking
 from speech import STTError, transcribe
+from ui import booking_table, validation_table
+from validator import validate_booking
 
 console = Console()
 
 
 def main() -> None:
+
     console.rule("[bold cyan]🚛 TruckSaathi")
 
     audio = Path("sample_audio/full context hyd to blr.m4a")
@@ -41,18 +43,36 @@ def main() -> None:
         transcription.transcript,
     )
 
+    console.print()
+
+    console.print(
+        booking_table(
+            extraction.booking,
+        )
+    )
+
+    validation = validate_booking(
+        extraction.booking,
+    )
+
+    console.print()
+
+    console.print(
+        validation_table(
+            extraction.booking,
+            validation,
+        )
+    )
+
     elapsed = perf_counter() - start
+
+    if validation.is_complete:
+        console.print("\n[bold green]🎉 Booking Complete[/bold green]")
+    else:
+        console.print("\n[bold red]⚠ Booking Incomplete[/bold red]")
 
     console.print(
         f"\n✅ Pipeline completed in {elapsed:.2f}s"
-    )
-
-    console.print(
-        Panel.fit(
-            Pretty(extraction.booking.model_dump()),
-            title="Booking Extraction",
-            border_style="cyan",
-        )
     )
 
 
