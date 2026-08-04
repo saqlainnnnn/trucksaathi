@@ -1,10 +1,8 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
 class BookingField(BaseModel):
-    value: Optional[str] = None
+    value: str | None = None
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
     reason: str = ""
 
@@ -19,3 +17,10 @@ class BookingDraft(BaseModel):
     pickup_time: BookingField = Field(default_factory=BookingField)
     contact_name: BookingField = Field(default_factory=BookingField)
     phone_number: BookingField = Field(default_factory=BookingField)
+
+
+class TranscriptionResult(BaseModel):
+    transcript: str
+    language_code: str | None = None
+    language_probability: float | None = None
+    request_id: str | None = None

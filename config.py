@@ -1,14 +1,17 @@
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings:
-    def __init__(self):
-        self.sarvam_api_key = os.getenv("SARVAM_API_KEY", "")
-        self.groq_api_key = os.getenv("GROQ_API_KEY", "")
-        self.smallest_api_key = os.getenv("SMALLEST_API_KEY", "")
+class Settings(BaseSettings):
+    sarvam_api_key: str
+    groq_api_key: str
+    smallest_api_key: str
+
+    sarvam_stt_url: str = "https://api.sarvam.ai/speech-to-text"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+    )
 
 
 settings = Settings()
