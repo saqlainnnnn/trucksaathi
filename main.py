@@ -59,6 +59,11 @@ def main() -> None:
         transcription.transcript,
     )
 
+
+    validation = validate_booking(
+        extraction.booking,
+    )
+
     console.print()
 
     console.print(

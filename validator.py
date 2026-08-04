@@ -21,6 +21,13 @@ WEIGHT_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+def invalidate_field(
+    booking: BookingExtraction,
+    field_name: str,
+):
+    field = getattr(booking, field_name)
+    field.confidence = 0.0
+
 
 def validate_booking(
     booking: BookingExtraction,

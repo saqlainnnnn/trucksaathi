@@ -7,11 +7,7 @@ class BookingField(BaseModel):
     """
 
     value: str | None = None
-    confidence: float = Field(
-        default=0.0,
-        ge=0.0,
-        le=1.0,
-    )
+    confidence: float = 0.0
     reason: str | None = None
 
 
