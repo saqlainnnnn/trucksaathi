@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     smallest_api_key: str
 
     sarvam_stt_url: str = "https://api.sarvam.ai/speech-to-text"
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+    llm_model: str = "llama-3.3-70b-versatile"
 
     model_config = SettingsConfigDict(
         env_file=".env",

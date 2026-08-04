@@ -3,7 +3,9 @@ from time import perf_counter
 
 from rich.console import Console
 from rich.panel import Panel
+from rich.pretty import Pretty
 
+from extractor import extract_booking
 from speech import STTError, transcribe
 
 console = Console()
@@ -19,31 +21,39 @@ def main() -> None:
     start = perf_counter()
 
     try:
-        result = transcribe(audio)
+        transcription = transcribe(audio)
 
-    except STTError as e:
-        console.print(f"[red]Error:[/red] {e}")
+    except STTError as exc:
+        console.print(f"[red]{exc}[/red]")
         return
-
-    elapsed = perf_counter() - start
-
-    console.print(f"✅ Completed in {elapsed:.2f}s")
 
     console.print(
         Panel.fit(
-            result.transcript,
+            transcription.transcript,
             title="Transcript",
             border_style="green",
         )
     )
 
-    if result.language_code:
-        console.print(f"Language : {result.language_code}")
+    console.print("\n🧠 Extracting booking...")
 
-    if result.language_probability is not None:
-        console.print(
-            f"Confidence : {result.language_probability:.2f}"
+    extraction = extract_booking(
+        transcription.transcript,
+    )
+
+    elapsed = perf_counter() - start
+
+    console.print(
+        f"\n✅ Pipeline completed in {elapsed:.2f}s"
+    )
+
+    console.print(
+        Panel.fit(
+            Pretty(extraction.booking.model_dump()),
+            title="Booking Extraction",
+            border_style="cyan",
         )
+    )
 
 
 if __name__ == "__main__":
