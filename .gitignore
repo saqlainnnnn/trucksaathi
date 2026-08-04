@@ -27,3 +27,6 @@ sample_audio/*.wav
 sample_audio/*.mp3
 sample_audio/*.ogg
 !sample_audio/.gitkeep
+
+__pycache__/
+*.py[cod]
