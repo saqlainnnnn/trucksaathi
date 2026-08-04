@@ -75,6 +75,7 @@ class TranscriptionResult(BaseModel):
 
     request_id: str | None = None
 
+
 class ValidationIssue(BaseModel):
     field: str
     reason: str

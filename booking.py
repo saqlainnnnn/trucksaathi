@@ -16,9 +16,7 @@ def merge_booking(
     merged = deepcopy(previous)
 
     for field_name, field in current:
-
         if field.value:
-
             setattr(
                 merged,
                 field_name,

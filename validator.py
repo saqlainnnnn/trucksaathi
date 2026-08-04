@@ -38,6 +38,7 @@ def validate_booking(
     #
 
     for field_name in REQUIRED_FIELDS:
+
         field = getattr(booking, field_name)
 
         if not field.value:
@@ -52,6 +53,7 @@ def validate_booking(
     #
 
     if booking.phone_number.value:
+
         digits = re.sub(
             r"\D",
             "",
@@ -59,6 +61,7 @@ def validate_booking(
         )
 
         if len(digits) != 10:
+
             invalid_fields.append(
                 ValidationIssue(
                     field="phone_number",
@@ -70,27 +73,30 @@ def validate_booking(
     # Weight
     #
 
-    if booking.weight.value:
-        if not WEIGHT_PATTERN.search(booking.weight.value):
-            invalid_fields.append(
-                ValidationIssue(
-                    field="weight",
-                    reason="Weight should contain a numeric value and unit.",
-                )
+    if booking.weight.value and not WEIGHT_PATTERN.search(
+        booking.weight.value
+    ):
+        invalid_fields.append(
+            ValidationIssue(
+                field="weight",
+                reason="Weight should contain a numeric value and unit.",
             )
+        )
 
     #
     # Truck type validation
     #
 
-    if booking.truck_type.value:
-        if len(booking.truck_type.value.strip()) < 2:
-            invalid_fields.append(
-                ValidationIssue(
-                    field="truck_type",
-                    reason="Truck type appears to be invalid.",
-                )
+    if (
+        booking.truck_type.value
+        and len(booking.truck_type.value.strip()) < 2
+    ):
+        invalid_fields.append(
+            ValidationIssue(
+                field="truck_type",
+                reason="Truck type appears invalid.",
             )
+        )
 
     #
     # Pickup & Destination sanity check
@@ -102,6 +108,7 @@ def validate_booking(
         and booking.pickup.value.strip().lower()
         == booking.destination.value.strip().lower()
     ):
+
         invalid_fields.append(
             ValidationIssue(
                 field="destination",

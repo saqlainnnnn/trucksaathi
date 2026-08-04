@@ -12,7 +12,6 @@ def booking_table(booking: BookingExtraction) -> Table:
     table.add_column("Reason")
 
     for field_name, field in booking:
-
         table.add_row(
             field_name,
             field.value or "-",
@@ -35,7 +34,6 @@ def validation_table(
     table.add_column("Notes")
 
     for field_name, field in booking:
-
         status = "✅"
         note = ""
 

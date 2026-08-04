@@ -4,10 +4,10 @@ from time import perf_counter
 from rich.console import Console
 from rich.panel import Panel
 
-from extractor import extract_booking
-from followup import generate_followup
+from llm.extractor import extract_booking
+from llm.followup import generate_followup
 from speech import STTError, transcribe
-from tts import (
+from speech.tts import (
     TTSError,
     synthesize_confirmation,
     synthesize_followup,
@@ -16,7 +16,7 @@ from ui import (
     booking_table,
     validation_table,
 )
-from validator import validate_booking
+from validation.validator import validate_booking
 
 console = Console()
 
@@ -89,21 +89,14 @@ def main() -> None:
     #
 
     try:
-
         if validation.is_complete:
-
-            console.print(
-                "\n[bold green]🎉 Booking Complete[/bold green]"
-            )
+            console.print("\n[bold green]🎉 Booking Complete[/bold green]")
 
             audio_path = synthesize_confirmation()
 
-            console.print(
-                f"\n🔊 Confirmation saved to [cyan]{audio_path}[/cyan]"
-            )
+            console.print(f"\n🔊 Confirmation saved to [cyan]{audio_path}[/cyan]")
 
         else:
-
             question = generate_followup(
                 extraction.booking,
                 validation,
@@ -123,15 +116,10 @@ def main() -> None:
                 question,
             )
 
-            console.print(
-                f"\n🔊 Follow-up saved to [cyan]{audio_path}[/cyan]"
-            )
+            console.print(f"\n🔊 Follow-up saved to [cyan]{audio_path}[/cyan]")
 
     except TTSError as exc:
-
-        console.print(
-            f"\n[bold red]TTS Error:[/bold red] {exc}"
-        )
+        console.print(f"\n[bold red]TTS Error:[/bold red] {exc}")
 
     #
     # Pipeline metrics
@@ -139,9 +127,7 @@ def main() -> None:
 
     elapsed = perf_counter() - pipeline_start
 
-    console.print(
-        f"\n✅ Pipeline completed in [bold]{elapsed:.2f}s[/bold]"
-    )
+    console.print(f"\n✅ Pipeline completed in [bold]{elapsed:.2f}s[/bold]")
 
 
 if __name__ == "__main__":

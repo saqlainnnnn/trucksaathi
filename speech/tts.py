@@ -68,12 +68,9 @@ def synthesize(
         return output_path
 
     except requests.Timeout as exc:
-        raise TTSError(
-            "Smallest.ai request timed out."
-        ) from exc
+        raise TTSError("Smallest.ai request timed out.") from exc
 
     except requests.HTTPError as exc:
-
         response = exc.response
 
         if response is not None:
@@ -81,14 +78,10 @@ def synthesize(
         else:
             message = str(exc)
 
-        raise TTSError(
-            f"Smallest.ai HTTP Error:\n{message}"
-        ) from exc
+        raise TTSError(f"Smallest.ai HTTP Error:\n{message}") from exc
 
     except requests.RequestException as exc:
-        raise TTSError(
-            f"Network error: {exc}"
-        ) from exc
+        raise TTSError(f"Network error: {exc}") from exc
 
 
 def synthesize_followup(
@@ -109,9 +102,7 @@ def synthesize_confirmation() -> Path:
     Generate spoken booking confirmation.
     """
 
-    confirmation = (
-        "Aapki truck booking safalta se confirm ho gayi hai. Dhanyavaad."
-    )
+    confirmation = "Aapki truck booking safalta se confirm ho gayi hai. Dhanyavaad."
 
     return synthesize(
         confirmation,

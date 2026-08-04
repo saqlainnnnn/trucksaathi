@@ -89,9 +89,7 @@ def extract_booking(
         raise ExtractionError("LLM returned invalid JSON.") from exc
 
     except ValidationError as exc:
-        raise ExtractionError(
-            f"Structured output validation failed:\n{exc}"
-        ) from exc
+        raise ExtractionError(f"Structured output validation failed:\n{exc}") from exc
 
     except Exception as exc:
         raise ExtractionError(str(exc)) from exc
