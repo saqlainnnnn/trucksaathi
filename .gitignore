@@ -1,0 +1,29 @@
+# Virtual Environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output
+output/*
+!output/.gitkeep
+
+# Audio Samples
+sample_audio/*.wav
+sample_audio/*.mp3
+sample_audio/*.ogg
+!sample_audio/.gitkeep
