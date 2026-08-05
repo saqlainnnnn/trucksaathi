@@ -19,6 +19,9 @@ from ui import booking_table
 
 from validation.validator import validate_booking
 
+from booking.sqlite_repository import SQLiteBookingRepository
+from conversation.sqlite_store import SQLiteSessionStore
+
 console = Console()
 
 
@@ -28,7 +31,8 @@ def main() -> None:
     audio = Path("sample_audio/deliberate incomplete bom to pune.m4a")
 
     manager = ConversationManager(
-        store=MemorySessionStore(),
+        store=SQLiteSessionStore("data/trucksaathi.db"),
+        booking_repository=SQLiteBookingRepository("data/trucksaathi.db"),
         merge_engine=MergeEngine(),
         stt=transcribe,
         extractor=extract_booking,

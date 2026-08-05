@@ -19,6 +19,8 @@ from schemas import (
     ValidationResult,
 )
 
+from booking.repository import BookingRepository
+
 SESSION_TIMEOUT = timedelta(minutes=30)
 
 STTFunction = Callable[[str | Path], TranscriptionResult]
@@ -37,6 +39,7 @@ class ConversationManager:
     def __init__(
         self,
         store: SessionStore,
+        booking_repository: BookingRepository,
         merge_engine: MergeEngine,
         stt: STTFunction,
         extractor: ExtractorFunction,
@@ -45,16 +48,27 @@ class ConversationManager:
         followup_tts: FollowupTTSFunction,
         confirmation_tts: ConfirmationTTSFunction,
     ) -> None:
+        """
+        Initialize the conversation manager with all required dependencies.
+        """
+
         self._store = store
+
+        self._booking_repository = booking_repository
+
         self._merge = merge_engine
 
         self._stt = stt
-        self._extractor = extractor
-        self._validator = validator
-        self._followup = followup_generator
-        self._followup_tts = followup_tts
-        self._confirmation_tts = confirmation_tts
 
+        self._extractor = extractor
+
+        self._validator = validator
+
+        self._followup = followup_generator
+
+        self._followup_tts = followup_tts
+
+        self._confirmation_tts = confirmation_tts
     def process(
         self,
         user_id: str,
@@ -97,6 +111,10 @@ class ConversationManager:
                     assistant_reply=reply_text,
                     extraction=extraction.booking,
                 )
+            )
+
+            self._booking_repository.save(
+                session.booking,
             )
 
             self._store.delete(user_id)
