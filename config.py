@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     sarvam_api_key: str
     groq_api_key: str
     smallest_api_key: str
+    telegram_bot_token: str 
 
     sarvam_stt_url: str = "https://api.sarvam.ai/speech-to-text"
     groq_base_url: str = "https://api.groq.com/openai/v1"
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
     tts_sample_rate: int = 24000
 
     tts_output_format: str = "wav"
+    database_path: str = "data/trucksaathi.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",
