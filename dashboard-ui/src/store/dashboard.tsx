@@ -1,5 +1,6 @@
 import {
     createContext,
+    useCallback,
     useContext,
     useState,
 } from "react";
@@ -45,6 +46,8 @@ interface DashboardState {
         status: StageStatus,
         latency?: number,
     ) => void;
+
+    handleEvent: (event: any) => void;
 }
 
 const DashboardContext =
@@ -56,86 +59,165 @@ export function DashboardProvider({
     children: React.ReactNode;
 }) {
     const [pipeline, setPipeline] =
-        useState<PipelineStage[]>(initialPipeline);
+        useState<PipelineStage[]>(
+            initialPipeline,
+        );
 
     const [selectedStage, setSelectedStage] =
-        useState<PipelineStage>(initialPipeline[0]!);
+        useState<PipelineStage>(
+            initialPipeline[0]!,
+        );
 
     const [booking, setBooking] =
-        useState<BookingState>(initialBooking);
+        useState<BookingState>(
+            initialBooking,
+        );
 
     const [conversation, setConversation] =
-        useState<ConversationMessage[]>(
-            initialConversation,
-        );
+        useState<
+            ConversationMessage[]
+        >(initialConversation);
 
     const [logs, setLogs] =
         useState<LogEntry[]>(initialLogs);
 
-    function selectStage(id: string) {
-        const stage = pipeline.find(
-            (s) => s.id === id,
+    const selectStage = useCallback(
+        (id: string) => {
+            const stage = pipeline.find(
+                (s) => s.id === id,
+            );
+
+            if (stage) {
+                setSelectedStage(stage);
+            }
+        },
+        [pipeline],
+    );
+
+    const addLog = useCallback(
+        (log: LogEntry) => {
+            setLogs((prev) => [
+                ...prev,
+                log,
+            ]);
+        },
+        [],
+    );
+
+    const addConversation =
+        useCallback(
+            (
+                message: ConversationMessage,
+            ) => {
+                setConversation((prev) => [
+                    ...prev,
+                    message,
+                ]);
+            },
+            [],
         );
 
-        if (stage) {
-            setSelectedStage(stage);
-        }
-    }
+    const updateBooking =
+        useCallback(
+            <
+                K extends keyof BookingState,
+            >(
+                field: K,
+                value: BookingState[K],
+            ) => {
+                setBooking((prev) => ({
+                    ...prev,
+                    [field]: value,
+                }));
+            },
+            [],
+        );
 
-    function addLog(log: LogEntry) {
-        setLogs((prev) => [...prev, log]);
-    }
+    const updateStage = useCallback(
+        (
+            id: string,
+            status: StageStatus,
+            latency?: number,
+        ) => {
+            setPipeline((prev) =>
+                prev.map((stage) =>
+                    stage.id === id
+                        ? {
+                              ...stage,
+                              status,
+                              latency:
+                                  latency ??
+                                  stage.latency,
+                          }
+                        : stage,
+                ),
+            );
 
-    function addConversation(
-        message: ConversationMessage,
-    ) {
-        setConversation((prev) => [
-            ...prev,
-            message,
-        ]);
-    }
-
-    function updateBooking<
-        K extends keyof BookingState,
-    >(
-        field: K,
-        value: BookingState[K],
-    ) {
-        setBooking((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-    }
-
-    function updateStage(
-        id: string,
-        status: StageStatus,
-        latency?: number,
-    ) {
-        setPipeline((prev) =>
-            prev.map((stage) =>
-                stage.id === id
+            setSelectedStage((prev) =>
+                prev.id === id
                     ? {
-                          ...stage,
+                          ...prev,
                           status,
                           latency:
                               latency ??
-                              stage.latency,
+                              prev.latency,
                       }
-                    : stage,
-            ),
-        );
+                    : prev,
+            );
+        },
+        [],
+    );
 
-        if (selectedStage.id === id) {
-            setSelectedStage((prev) => ({
-                ...prev,
-                status,
-                latency:
-                    latency ??
-                    prev.latency,
-            }));
-        }
-    }
+    const handleEvent = useCallback(
+        (event: any) => {
+            switch (event.type) {
+                case "stage_started":
+                    updateStage(
+                        event.payload.stage,
+                        "running",
+                    );
+                    break;
+
+                case "stage_finished":
+                    updateStage(
+                        event.payload.stage,
+                        "completed",
+                        event.payload.latency,
+                    );
+                    break;
+
+                case "booking_updated":
+                    setBooking(event.payload);
+                    break;
+
+                case "conversation":
+                    addConversation({
+                        role: event.payload.role,
+                        text: event.payload.text,
+                    });
+                    break;
+
+                case "log":
+                    addLog({
+                        time: new Date().toLocaleTimeString(),
+                        level: event.payload.level,
+                        message: event.payload.message,
+                    });
+                    break;
+
+                default:
+                    console.warn(
+                        "Unknown dashboard event",
+                        event,
+                    );
+            }
+        },
+        [
+            addConversation,
+            addLog,
+            updateStage,
+        ],
+    );
 
     return (
         <DashboardContext.Provider
@@ -148,10 +230,14 @@ export function DashboardProvider({
                 logs,
 
                 selectStage,
+
                 addLog,
                 addConversation,
+
                 updateBooking,
                 updateStage,
+
+                handleEvent,
             }}
         >
             {children}

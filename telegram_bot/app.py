@@ -5,6 +5,9 @@ from config import settings
 from conversation.manager import ConversationManager
 from conversation.merge import MergeEngine
 from conversation.sqlite_store import SQLiteSessionStore
+from dashboard.sqlite_repository import (
+    SQLiteDashboardRepository,
+)
 from llm.extractor import extract_booking
 from llm.followup import generate_followup
 from speech.stt import transcribe
@@ -28,13 +31,22 @@ class TruckSaathiApp:
             settings.database_path,
         )
 
-        self.booking_repository = SQLiteBookingRepository(
-            settings.database_path,
+        self.booking_repository = (
+            SQLiteBookingRepository(
+                settings.database_path,
+            )
+        )
+
+        self.dashboard_repository = (
+            SQLiteDashboardRepository(
+                settings.database_path,
+            )
         )
 
         self.manager = ConversationManager(
             store=self.session_store,
             booking_repository=self.booking_repository,
+            dashboard_repository=self.dashboard_repository,
             merge_engine=MergeEngine(),
             stt=transcribe,
             extractor=extract_booking,
@@ -50,4 +62,7 @@ class TruckSaathiApp:
         """
 
         self.session_store.close()
+
         self.booking_repository.close()
+
+        self.dashboard_repository.close()

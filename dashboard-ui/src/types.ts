@@ -31,6 +31,10 @@ export interface ConversationMessage {
 
 export interface LogEntry {
     time: string;
-    level: "success" | "running" | "error";
+    level:
+        | "success"
+        | "running"
+        | "info"
+        | "error";
     message: string;
 }

@@ -11,7 +11,8 @@ def main() -> None:
     app = TruckSaathiApp()
 
     handler = VoiceHandler(
-        app.manager,
+        manager=app.manager,
+        dashboard=app.dashboard_repository,
     )
 
     bot = TruckSaathiBot(

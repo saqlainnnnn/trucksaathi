@@ -1,41 +1,63 @@
-import { performance } from "../data/mock";
+import { useDashboard } from "../store/dashboard";
 
 export default function PerformanceCard() {
-    const maxLatency = Math.max(
-        ...performance.map((s) => s.latency),
+    const { pipeline } = useDashboard();
+
+    const stages = pipeline.filter(
+        (stage) => stage.latency !== undefined,
     );
 
-    const total = performance.reduce(
-        (sum, stage) => sum + stage.latency,
+    const maxLatency =
+        stages.length > 0
+            ? Math.max(
+                  ...stages.map(
+                      (stage) =>
+                          stage.latency ?? 0,
+                  ),
+              )
+            : 1;
+
+    const total = stages.reduce(
+        (sum, stage) =>
+            sum + (stage.latency ?? 0),
         0,
     );
 
     return (
         <div className="space-y-5">
-            {performance.map((stage) => (
+            {pipeline.map((stage) => (
                 <div
-                    key={stage.stage}
+                    key={stage.id}
                     className="grid grid-cols-[140px_1fr_70px] items-center gap-4"
                 >
                     <span className="text-zinc-300">
-                        {stage.stage}
+                        {stage.name}
                     </span>
 
                     <div className="h-3 rounded-full bg-zinc-800">
                         <div
                             className="h-full rounded-full bg-blue-500 transition-all duration-500"
                             style={{
-                                width: `${
-                                    (stage.latency /
-                                        maxLatency) *
-                                    100
-                                }%`,
+                                width:
+                                    stage.latency !=
+                                        null &&
+                                    maxLatency > 0
+                                        ? `${
+                                              (stage.latency /
+                                                  maxLatency) *
+                                              100
+                                          }%`
+                                        : "0%",
                             }}
                         />
                     </div>
 
                     <span className="text-right text-sm text-zinc-400">
-                        {stage.latency} ms
+                        {stage.latency != null
+                            ? `${stage.latency.toFixed(
+                                  0,
+                              )} ms`
+                            : "--"}
                     </span>
                 </div>
             ))}
@@ -45,7 +67,10 @@ export default function PerformanceCard() {
                     <span>Total</span>
 
                     <span>
-                        {(total / 1000).toFixed(2)} s
+                        {(total / 1000).toFixed(
+                            2,
+                        )}{" "}
+                        s
                     </span>
                 </div>
             </div>

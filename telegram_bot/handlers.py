@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import subprocess
+import time
 from pathlib import Path
 
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from conversation.manager import ConversationManager
+from dashboard.repository import DashboardRepository
 
 
 class VoiceHandler:
@@ -17,8 +19,10 @@ class VoiceHandler:
     def __init__(
         self,
         manager: ConversationManager,
+        dashboard: DashboardRepository,
     ) -> None:
         self._manager = manager
+        self._dashboard = dashboard
 
     async def start(
         self,
@@ -73,8 +77,18 @@ class VoiceHandler:
         wav_path = temp_dir / f"{user_id}.wav"
 
         #
-        # Download Telegram voice
+        # Telegram Stage
         #
+
+        telegram_start = time.perf_counter()
+
+        self._dashboard.stage_started(
+            "telegram_in",
+        )
+
+        self._dashboard.log(
+            "Telegram update received.",
+        )
 
         telegram_file = await context.bot.get_file(
             update.message.voice.file_id,
@@ -86,9 +100,28 @@ class VoiceHandler:
 
         print(f"⬇ Downloaded to {ogg_path}")
 
+        self._dashboard.log(
+            "Voice note downloaded.",
+        )
+
+        self._dashboard.stage_finished(
+            "telegram_in",
+            (
+                time.perf_counter()
+                - telegram_start
+            )
+            * 1000,
+        )
+
         #
-        # Convert OGG (Opus) -> WAV
+        # FFmpeg Stage
         #
+
+        ffmpeg_start = time.perf_counter()
+
+        self._dashboard.stage_started(
+            "ffmpeg",
+        )
 
         print("🎵 Converting to WAV...")
 
@@ -111,6 +144,19 @@ class VoiceHandler:
 
         print(f"✅ Converted to {wav_path}")
 
+        self._dashboard.stage_finished(
+            "ffmpeg",
+            (
+                time.perf_counter()
+                - ffmpeg_start
+            )
+            * 1000,
+        )
+
+        self._dashboard.log(
+            "Audio converted to WAV.",
+        )
+
         #
         # Process conversation
         #
@@ -130,8 +176,14 @@ class VoiceHandler:
             return
 
         #
-        # Send spoken response
+        # Telegram Reply Stage
         #
+
+        reply_start = time.perf_counter()
+
+        self._dashboard.stage_started(
+            "telegram_out",
+        )
 
         with open(
             response.reply_audio_path,
@@ -140,5 +192,18 @@ class VoiceHandler:
             await update.message.reply_voice(
                 voice=audio,
             )
+
+        self._dashboard.stage_finished(
+            "telegram_out",
+            (
+                time.perf_counter()
+                - reply_start
+            )
+            * 1000,
+        )
+
+        self._dashboard.log(
+            "Reply sent to Telegram.",
+        )
 
         print("✅ Reply sent")

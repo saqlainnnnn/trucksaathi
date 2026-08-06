@@ -1,6 +1,8 @@
-import { logs } from "../data/mock";
+import { useDashboard } from "../store/dashboard";
 
 export default function LogsCard() {
+    const { logs } = useDashboard();
+
     return (
         <div className="h-56 overflow-y-auto rounded-lg bg-black p-4 font-mono text-sm">
             <div className="space-y-2">
@@ -19,6 +21,8 @@ export default function LogsCard() {
                                     ? "text-green-400"
                                     : log.level === "running"
                                     ? "text-yellow-400 animate-pulse"
+                                    : log.level === "info"
+                                    ? "text-blue-400"
                                     : "text-red-400"
                             }
                         >
@@ -26,6 +30,8 @@ export default function LogsCard() {
                                 ? "✓"
                                 : log.level === "running"
                                 ? "●"
+                                : log.level === "info"
+                                ? "ℹ"
                                 : "✕"}
                         </span>
 

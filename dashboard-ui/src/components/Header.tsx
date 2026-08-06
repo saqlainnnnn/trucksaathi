@@ -1,5 +1,3 @@
-import { request } from "../data/mock";
-
 export default function Header() {
     return (
         <header className="flex items-center justify-between border-b border-zinc-800 pb-6">
@@ -16,26 +14,26 @@ export default function Header() {
             <div className="flex gap-6">
                 <Metric
                     title="Request"
-                    value={request.id}
+                    value="—"
                 />
 
                 <Metric
                     title="Status"
-                    value={request.status}
+                    value="Waiting"
                 />
 
                 <Metric
                     title="Total"
-                    value={request.totalLatency}
+                    value="—"
                 />
 
                 <Metric
                     title="Language"
-                    value={request.language}
+                    value="—"
                 />
 
                 <div className="flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-3">
-                    <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+                    <div className="h-3 w-3 animate-pulse rounded-full bg-green-500" />
 
                     <span>Connected</span>
                 </div>

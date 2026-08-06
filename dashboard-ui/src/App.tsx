@@ -43,10 +43,10 @@ export default function App() {
 
                     <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
                         <h2 className="mb-4 text-xl font-semibold">
-                            <ConversationCard />
+                            Conversation
                         </h2>
 
-                        <BookingCard />
+                        <ConversationCard />
                     </div>
                 </section>
 
